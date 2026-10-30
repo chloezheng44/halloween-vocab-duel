@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>万圣节词汇擂台</title>
+<style>
+/* 这是一个固定的“夜晚”主题:亮色/暗色系统设置下外观一致 */
+:root{
+  --bg:#0b0713; --bg2:#1a0f2e; --ink:#f3e9ff; --muted:#a898c4;
+  --o:#ff8a1f; --o-glow:rgba(255,138,31,.38);
+  --v:#a47bff; --v-glow:rgba(164,123,255,.38);
+  --ok:#3ddc84; --bad:#ff4d6d;
+  --card:rgba(28,17,50,.82); --line:rgba(255,255,255,.14);
+  color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{
+  background:
+    radial-gradient(ellipse at 85% 6%, rgba(255,200,120,.20) 0, rgba(255,200,120,0) 22%),
+    radial-gradient(ellipse at 50% 120%, rgba(120,70,210,.35) 0, rgba(120,70,210,0) 55%),
+    linear-gradient(180deg,#0b0713 0%,#140a26 60%,#1c0f33 100%);
+  background-color:#0b0713;
+  color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,-apple-system,"Segoe UI",sans-serif;
+  overflow:hidden;
+}
+button{font:inherit;color:inherit}
+.hidden{display:none !important}
+
+/* 背景装饰 */
+.moon{position:fixed;top:4vh;right:6vw;width:min(14vw,120px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff6dc,#ffd98a 60%,#e8b45a);
+  box-shadow:0 0 60px 20px rgba(255,210,130,.28);opacity:.9;z-index:0;pointer-events:none}
+.bats{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bats span{position:absolute;left:-8vw;font-size:clamp(1.4rem,3vw,2.6rem);opacity:.55;animation:fly linear infinite}
+.bats span:nth-child(1){top:8%;animation-duration:26s;animation-delay:-4s}
+.bats span:nth-child(2){top:18%;animation-duration:34s;animation-delay:-18s}
+.bats span:nth-child(3){top:30%;animation-duration:30s;animation-delay:-9s;font-size:1.3rem}
+.bats span:nth-child(4){top:12%;animation-duration:42s;animation-delay:-30s}
+@keyframes fly{0%{transform:translate(0,0)}25%{transform:translate(28vw,-14px)}50%{transform:translate(58vw,10px)}75%{transform:translate(86vw,-12px)}100%{transform:translate(118vw,0)}}
+#app{position:relative;z-index:1;height:100%}
+.screen{height:100%;display:flex;flex-direction:column}
+
+/* ===== 首页 ===== */
+.setup{overflow:auto}
+.setupwrap{width:min(900px,100%);margin:0 auto;padding:clamp(14px,3vh,34px) clamp(14px,3vw,28px) 40px}
+.logo{text-align:center;margin-bottom:clamp(8px,2vh,22px)}
+.logo .pumpkin{font-size:clamp(3rem,8vw,5.5rem);line-height:1;filter:drop-shadow(0 0 22px rgba(255,138,31,.75));animation:flicker 3.2s infinite}
+.title{font-family:"Chiller","Creepster","Impact","Arial Black",fantasy;font-weight:400;letter-spacing:.06em;margin:4px 0 0;
+  font-size:clamp(2.2rem,7vw,4.6rem);color:var(--o);text-shadow:0 0 18px rgba(255,138,31,.6),0 3px 0 #5a2200}
+.sub{color:var(--muted);font-size:clamp(.95rem,1.8vw,1.2rem);margin-top:4px}
+@keyframes flicker{0%,100%{filter:drop-shadow(0 0 22px rgba(255,138,31,.75))}46%{filter:drop-shadow(0 0 30px rgba(255,170,60,.95))}50%{filter:drop-shadow(0 0 12px rgba(255,138,31,.4))}54%{filter:drop-shadow(0 0 28px rgba(255,170,60,.9))}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:clamp(14px,2.4vw,26px);box-shadow:0 0 50px rgba(120,70,210,.22)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field>span{font-size:.95rem;color:var(--muted);font-weight:600}
+.field.l>span{color:var(--o)} .field.r>span{color:var(--v)}
+input,textarea,select{width:100%;background:#12091f;color:var(--ink);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:1.05rem}
+textarea{resize:vertical;min-height:150px;line-height:1.55;font-family:ui-monospace,Menlo,Consolas,"PingFang SC","Microsoft YaHei",monospace;font-size:.98rem}
+input:focus,textarea:focus,select:focus,button:focus-visible{outline:3px solid #ffcf9a;outline-offset:2px}
+.wordbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:-6px 0 16px}
+.wordbar #wcount{flex:1;min-width:150px;font-size:.95rem;color:var(--muted)}
+.wordbar #wcount.warn{color:var(--bad)}
+.ghost{background:transparent;border:1.5px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;font-size:.92rem}
+.ghost:hover{border-color:var(--o)}
+.keys{font-size:.95rem;color:var(--muted);text-align:center;margin:2px 0 14px;line-height:1.7}
+.keys b{color:var(--ink)}
+.big{display:block;width:100%;border:0;border-radius:16px;padding:14px;font-size:1.5rem;font-weight:900;letter-spacing:.2em;cursor:pointer;
+  color:#2a1000;background:linear-gradient(180deg,#ffb347,#ff7a00);box-shadow:0 6px 0 #a64a00,0 0 32px rgba(255,138,31,.5);transition:transform .1s,box-shadow .1s}
+.big:hover{transform:translateY(-1px)}
+.big:active{transform:translateY(5px);box-shadow:0 1px 0 #a64a00,0 0 20px rgba(255,138,31,.5)}
+.tip{color:var(--muted);font-size:.88rem;text-align:center;margin:12px 0 0}
+.seriesrow{text-align:center;color:var(--muted);font-size:.95rem;margin-top:10px}
+.link{background:none;border:0;color:var(--v);cursor:pointer;text-decoration:underline;font-size:.95rem}
+.err{color:var(--bad);text-align:center;margin:10px 0 0;font-weight:700;min-height:1.2em}
+
+/* ===== 对局 ===== */
+#game{-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px clamp(12px,2vw,28px) 2px}
+.series{color:var(--muted);font-size:clamp(.85rem,1.5vw,1.1rem);font-weight:700}
+.series b{color:var(--ink);font-size:1.35em;margin:0 4px}
+.prog{font-weight:800;font-size:clamp(.95rem,1.8vw,1.35rem)}
+.prog.sd{color:#ffd23f;text-shadow:0 0 14px rgba(255,210,63,.7)}
+.tools{display:flex;gap:8px}
+.tools button{background:rgba(255,255,255,.06);border:1.5px solid var(--line);border-radius:12px;padding:10px 16px;min-height:44px;cursor:pointer;font-size:1rem;touch-action:manipulation}
+.tools button:hover{border-color:var(--o)}
+
+.tug{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:clamp(8px,1.5vw,22px);padding:4px clamp(12px,2vw,28px)}
+.lair{display:flex;flex-direction:column;align-items:center;font-size:clamp(1.8rem,3.6vw,3.2rem);line-height:1}
+.lair small{font-size:clamp(.7rem,1.2vw,.95rem);color:var(--muted);margin-top:4px;max-width:8em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track{position:relative;height:clamp(28px,4.2vw,46px)}
+.rail{position:absolute;inset:0;border-radius:999px;background:#150c26;border:2px solid var(--line);overflow:hidden}
+.fillL,.fillR{position:absolute;top:0;bottom:0;transition:width .6s cubic-bezier(.2,.9,.3,1.1)}
+.fillL{left:0;background:linear-gradient(90deg,rgba(255,138,31,.12),rgba(255,138,31,.75))}
+.fillR{right:0;background:linear-gradient(270deg,rgba(164,123,255,.12),rgba(164,123,255,.75))}
+.tick{position:absolute;top:30%;bottom:30%;width:2px;background:rgba(255,255,255,.22);transform:translateX(-50%)}
+.tick.mid{top:12%;bottom:12%;background:rgba(255,255,255,.5)}
+.orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:clamp(2.2rem,5vw,4rem);line-height:1;
+  transition:left .6s cubic-bezier(.2,.9,.3,1.25);filter:drop-shadow(0 0 14px #c9a2ff)}
+.orb.bump{animation:bump .5s}
+@keyframes bump{0%{scale:1}40%{scale:1.35}100%{scale:1}}
+
+.qcard{margin:6px clamp(12px,2vw,28px);padding:clamp(10px,1.4vw,20px) clamp(12px,2vw,24px);text-align:center;border-radius:22px;background:var(--card);border:1px solid var(--line);box-shadow:inset 0 0 44px rgba(155,107,255,.16)}
+.qtype{display:inline-block;font-size:clamp(.8rem,1.3vw,1.05rem);color:#ffd29b;background:rgba(255,138,31,.12);border:1px solid rgba(255,138,31,.4);border-radius:999px;padding:2px 14px;margin-bottom:6px}
+.qtext{font-size:clamp(2rem,6.2vw,5rem);font-weight:800;line-height:1.12;text-shadow:0 0 26px rgba(255,138,31,.5);word-break:break-word}
+.qtext.long{font-size:clamp(1.4rem,3.6vw,3rem)}
+.timer{height:8px;border-radius:99px;background:#1b1230;margin-top:10px;overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ffb347,#ff6a00)}
+.timer.low i{background:var(--bad)}
+.feedback{min-height:1.5em;margin-top:6px;font-weight:800;font-size:clamp(1rem,1.9vw,1.5rem)}
+
+.panels{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,1.6vw,24px);padding:2px clamp(12px,2vw,28px) clamp(10px,1.6vw,22px)}
+.panel{--c:var(--o);--cg:var(--o-glow);position:relative;display:flex;flex-direction:column;min-height:0;border-radius:22px;border:2px solid var(--c);
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(14,8,26,.82));box-shadow:0 0 26px var(--cg)}
+.panel.p1{--c:var(--v);--cg:var(--v-glow)}
+.phead{display:flex;align-items:center;gap:10px;padding:8px 16px 4px}
+.pemoji{font-size:clamp(1.4rem,2.6vw,2.2rem)}
+.pname{flex:1;min-width:0;font-weight:800;font-size:clamp(1rem,2vw,1.7rem);color:var(--c);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pscore{font-size:clamp(1.5rem,3.2vw,2.8rem);font-weight:900;line-height:1}
+.pscore small{font-size:.38em;color:var(--muted);font-weight:700;margin-left:4px}
+.streak{height:1.4em;padding:0 16px;font-size:clamp(.8rem,1.3vw,1.05rem);color:#ffd23f;font-weight:700}
+.opts{flex:1;min-height:0;display:grid;grid-template-rows:repeat(4,minmax(0,1fr));gap:8px;padding:0 12px 12px}
+.opt{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:12px;text-align:left;padding:0 14px;border-radius:16px;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);
+  font-size:clamp(1rem,2.2vw,1.9rem);font-weight:700;line-height:1.2;cursor:pointer;transition:transform .12s,background .12s,border-color .12s;min-height:0;overflow:hidden}
+@media (hover:hover){.opt:hover{background:rgba(255,255,255,.1);border-color:var(--c)}}
+.opt:active{transform:scale(.97);background:rgba(255,255,255,.16)}
+.opt kbd{flex:none;display:grid;place-items:center;width:1.9em;height:1.9em;border-radius:9px;background:var(--c);color:#170a00;font:inherit;font-weight:900;font-size:.8em}
+.opt span{min-width:0;overflow-wrap:anywhere}
+.opt.wrong{background:rgba(255,77,109,.25);border-color:var(--bad);animation:shake .35s}
+.opt.right{background:rgba(61,220,132,.28);border-color:var(--ok)}
+.opt.right::after{content:"✓";margin-left:auto;font-weight:900;color:var(--ok);font-size:1.2em}
+.opts.done{pointer-events:none}
+.opts.done .opt:not(.right){opacity:.32}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.panel.locked .opts{opacity:.4;pointer-events:none}
+.lockov{position:absolute;left:12px;right:12px;bottom:12px;top:auto;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  height:34%;border-radius:16px;background:rgba(10,4,20,.82);border:2px solid var(--bad);font-weight:800;font-size:clamp(1rem,2vw,1.6rem);color:#ffb3c1;text-align:center}
+.panel.locked .lockov{display:flex}
+.lockov i{display:block;width:70%;height:7px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;position:relative}
+.lockov i::after{content:"";position:absolute;inset:0;width:calc(var(--lock,0) * 100%);background:var(--bad)}
+.panel.flash{animation:flash .9s}
+@keyframes flash{0%{box-shadow:0 0 26px var(--cg)}25%{box-shadow:0 0 70px 14px var(--c)}100%{box-shadow:0 0 26px var(--cg)}}
+
+/* ===== 结果 ===== */
+.result{overflow:auto;align-items:center}
+.rescard{width:min(980px,100%);margin:auto;padding:clamp(16px,3vh,32px) clamp(14px,3vw,30px);text-align:center}
+.trophy{font-size:clamp(4rem,12vw,8rem);line-height:1;animation:bounce 1.2s ease-out;filter:drop-shadow(0 0 30px rgba(255,200,100,.7))}
+@keyframes bounce{0%{transform:scale(.2) rotate(-20deg);opacity:0}60%{transform:scale(1.2) rotate(6deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.rescard h2{font-family:"Chiller","Creepster","Impact","Arial Black",fantasy;font-weight:400;letter-spacing:.05em;font-size:clamp(2.2rem,6.5vw,4.4rem);margin:6px 0;color:#ffd29b;text-shadow:0 0 20px rgba(255,138,31,.6)}
+.ressub{color:var(--muted);font-size:clamp(1rem,1.8vw,1.3rem);margin:0 0 6px}
+.resseries{font-weight:700;margin:6px 0 18px}
+.resstats{display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;margin-bottom:20px}
+.sbox{--c:var(--o);border:2px solid var(--c);border-radius:20px;padding:14px 16px;background:var(--card)}
+.sbox.p1{--c:var(--v)}
+.sbox h3{margin:0 0 4px;color:var(--c);font-size:1.25rem}
+.sbox .nums{color:var(--muted);font-size:.98rem;margin-bottom:8px}
+.sbox .nums b{color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:rgba(255,77,109,.16);border:1px solid rgba(255,77,109,.5);border-radius:999px;padding:3px 11px;font-size:.92rem}
+.chip.miss{background:rgba(255,255,255,.08);border-color:var(--line)}
+.none{color:var(--ok);font-weight:700}
+.resbtns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.resbtns button{border-radius:14px;border:2px solid var(--line);background:rgba(255,255,255,.07);padding:12px 20px;font-size:1.1rem;font-weight:800;cursor:pointer}
+.resbtns button.main{background:linear-gradient(180deg,#ffb347,#ff7a00);color:#2a1000;border-color:transparent}
+.resbtns button.alt{border-color:var(--v)}
+.resbtns button:hover:not(:disabled){transform:translateY(-1px)}
+.resbtns button:disabled{opacity:.4;cursor:not-allowed}
+
+/* 暂停遮罩 */
+.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:rgba(6,3,12,.8);padding:20px}
+.ovcard{background:var(--card);border:2px solid var(--o);border-radius:24px;padding:28px 34px;text-align:center;box-shadow:0 0 60px var(--o-glow)}
+.ovcard h2{margin:0 0 6px;font-size:2rem}
+.ovcard p{color:var(--muted);margin:0 0 18px}
+.ovcard .resbtns{margin-top:6px}
+
+/* 掉落的表情 */
+#rain{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:15}
+#rain span{position:absolute;top:-10vh;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(360deg)}}
+
+@media (max-width:640px){
+  .row2,.row3,.resstats{grid-template-columns:1fr}
+  .panels{gap:6px}
+  .opt{gap:6px;padding:0 8px}
+}
+@media (prefers-reduced-motion:reduce){
+  .bats,.logo .pumpkin,.trophy{animation:none}
+  .bats span{animation:none}
+  *{transition-duration:.01ms !important}
+  .panel.flash,.opt.wrong,.orb.bump{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="moon" aria-hidden="true"></div>
+<div class="bats" aria-hidden="true"><span>🦇</span><span>🦇</span><span>🦇</span><span>🦇</span></div>
+<div id="rain" aria-hidden="true"></div>
+
+<main id="app">
+
+  <!-- 首页 -->
+  <section id="setup" class="screen setup">
+    <div class="setupwrap">
+      <div class="logo">
+        <div class="pumpkin">🎃</div>
+        <h1 class="title">Vocab Fright Night</h1>
+        <div class="sub">万圣节词汇擂台:两人同屏抢答,拔河定胜负</div>
+      </div>
+      <div class="card">
+        <div class="row2">
+          <label class="field l"><span>🎃 左边选手</span><input id="nameL" value="玩家甲" maxlength="12" autocomplete="off"></label>
+          <label class="field r"><span>👻 右边选手</span><input id="nameR" value="玩家乙" maxlength="12" autocomplete="off"></label>
+        </div>
+        <label class="field"><span>词表:每行一个,格式“单词,释义”(逗号或制表符分隔,可直接从 Excel 粘贴)</span>
+          <textarea id="words" rows="8" spellcheck="false"></textarea>
+        </label>
+        <div class="wordbar">
+          <span id="wcount"></span>
+          <button class="ghost" id="btnFile" type="button">导入 CSV / TXT</button>
+          <button class="ghost" id="btnSample" type="button">恢复示例词表</button>
+          <input type="file" id="file" accept=".csv,.txt,.tsv,text/csv,text/plain" hidden>
+        </div>
+        <div class="row3">
+          <label class="field"><span>题数</span>
+            <select id="cfgCount"><option value="10">10 题</option><option value="15">15 题</option><option value="20" selected>20 题</option><option value="30">30 题</option></select>
+          </label>
+          <label class="field"><span>每题限时</span>
+            <select id="cfgTime"><option value="8">8 秒</option><option value="12" selected>12 秒</option><option value="20">20 秒</option></select>
+          </label>
+          <label class="field"><span>操作方式</span>
+            <select id="cfgInput"><option value="touch">触屏点选</option><option value="key">键盘按键</option></select>
+          </label>
+          <label class="field"><span>题型</span>
+            <select id="cfgMode"><option value="mix" selected>混合</option><option value="m2w">看义选词</option><option value="w2m">看词选义</option></select>
+          </label>
+        </div>
+        <div class="keys" id="keysHelp"></div>
+        <button class="big" id="btnStart" type="button">开战!</button>
+        <div class="err" id="err" role="alert"></div>
+        <p class="tip" id="tipText"></p>
+        <div class="seriesrow" id="seriesRow">总比分 <b id="serTxt">0 : 0</b> <button class="link" id="btnResetSeries" type="button">清零</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 对局 -->
+  <section id="game" class="screen hidden">
+    <header class="topbar">
+      <div class="series">总比分<b id="serTop">0 : 0</b></div>
+      <div class="prog" id="prog"></div>
+      <div class="tools">
+        <button id="btnMute" type="button" aria-label="音效开关">🔊</button>
+        <button id="btnFull" type="button">⛶ 全屏</button>
+        <button id="btnSkip" type="button">⏭ 跳过</button>
+        <button id="btnPause" type="button">⏸ 暂停</button>
+      </div>
+    </header>
+
+    <div class="tug" aria-label="拔河条">
+      <div class="lair">🎃<small id="lairL"></small></div>
+      <div class="track">
+        <div class="rail"><div class="fillL" id="fillL"></div><div class="fillR" id="fillR"></div><div id="ticks"></div></div>
+        <div class="orb" id="orb">🔮</div>
+      </div>
+      <div class="lair">👻<small id="lairR"></small></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qtype" id="qtype"></div>
+      <div class="qtext" id="qtext"></div>
+      <div class="timer" id="timer"><i id="timerBar"></i></div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+    </div>
+
+    <div class="panels">
+      <div class="panel p0" id="panel0">
+        <div class="phead"><span class="pemoji">🎃</span><span class="pname" id="pname0"></span><span class="pscore"><span id="pscore0">0</span><small>抢对</small></span></div>
+        <div class="streak" id="streak0"></div>
+        <div class="opts" id="opts0"></div>
+        <div class="lockov"><span>答错了!先冷静一下</span><i></i></div>
+      </div>
+      <div class="panel p1" id="panel1">
+        <div class="phead"><span class="pemoji">👻</span><span class="pname" id="pname1"></span><span class="pscore"><span id="pscore1">0</span><small>抢对</small></span></div>
+        <div class="streak" id="streak1"></div>
+        <div class="opts" id="opts1"></div>
+        <div class="lockov"><span>答错了!先冷静一下</span><i></i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 结果 -->
+  <section id="result" class="screen result hidden">
+    <div class="rescard">
+      <div class="trophy" id="resEmoji">🏆</div>
+      <h2 id="resTitle"></h2>
+      <p class="ressub" id="resSub"></p>
+      <div class="resseries" id="resSeries"></div>
+      <div class="resstats" id="resStats"></div>
+      <div class="resbtns">
+        <button class="main" id="btnAgain" type="button">再来一局</button>
+        <button class="alt" id="btnRematch" type="button">错词再战</button>
+        <button id="btnSwap" type="button">换边</button>
+        <button id="btnHome" type="button">回首页</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="overlay hidden" id="pauseOv" role="dialog" aria-label="已暂停">
+  <div class="ovcard">
+    <h2>⏸ 已暂停</h2>
+    <p>计时已停止。按空格或点下面的按钮继续。</p>
+    <div class="resbtns">
+      <button class="main" id="btnResume" type="button">继续</button>
+      <button id="btnQuit" type="button">结束本局,回首页</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+  var LIMIT = 5;
+  var IS_TOUCH = (window.matchMedia && matchMedia("(pointer: coarse)").matches) || (navigator.maxTouchPoints||0) > 0;                       // 拔河条一侧的最大格数
+  var KEYS = { KeyA:[0,0], KeyS:[0,1], KeyD:[0,2], KeyF:[0,3], KeyJ:[1,0], KeyK:[1,1], KeyL:[1,2], Semicolon:[1,3] };
+  var KEYLABEL = [["A","S","D","F"],["J","K","L",";"]];
+  var EMOJI = ["🎃","👻"];
+  var LOCK_MS = 1500;
+
+  var SAMPLE = [
+    "pumpkin,南瓜","ghost,鬼魂","witch,女巫","skeleton,骷髅","costume,(化装)服装","candy,糖果","haunted,闹鬼的","spooky,阴森的",
+    "cauldron,大锅","broomstick,扫帚","bat,蝙蝠","spider,蜘蛛","cobweb,蛛网","graveyard,墓地","coffin,棺材","vampire,吸血鬼",
+    "werewolf,狼人","zombie,僵尸","mummy,木乃伊","monster,怪物","trick,恶作剧","treat,款待;糖果","lantern,灯笼","mask,面具",
+    "creepy,令人毛骨悚然的","scream,尖叫","shadow,影子","midnight,午夜","potion,魔药","curse,诅咒","fog,浓雾","owl,猫头鹰",
+    "tombstone,墓碑","scary,可怕的"
+  ].join("\n");
+
+  /* ---------- 状态 ---------- */
+  var S = {
+    phase:"setup", names:["玩家甲","玩家乙"], series:[0,0],
+    pool:[], cfg:{count:20,time:12,mode:"mix",input:IS_TOUCH?"touch":"key"},
+    deck:[], qi:0, wi:-1, q:null,
+    pos:0, points:[0,0], streak:[0,0],
+    wrong:[new Set(), new Set()], missed:new Set(), used:new Set(),
+    sudden:false, resolved:false, paused:false,
+    lock:[0,0], tried:[new Set(), new Set()],
+    timeLeft:0, advanceIn:0
+  };
+
+  /* ---------- 小工具 ---------- */
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function store(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  var CJK = /[\u3400-\u9fff]/;
+
+  function parseWords(text){
+    var rows=[], seen={};
+    text.replace(/^\uFEFF/,"").split(/\r?\n/).forEach(function(line,li){
+      line=line.trim(); if(!line) return;
+      var m=line.match(/^(.*?)[,\uFF0C\t]\s*(.+)$/); if(!m) return;
+      var a=m[1].trim().replace(/^["\u201C]+|["\u201D]+$/g,"").trim();
+      var b=m[2].trim().replace(/^["\u201C]+|["\u201D]+$/g,"").trim();
+      if(!a||!b) return;
+      if(li===0 && /^(word|words|english|单词|英文|词汇|词语)$/i.test(a)) return;
+      if(CJK.test(a) && !CJK.test(b)){ var t=a; a=b; b=t; }
+      var key=a+"|"+b; if(seen[key]) return; seen[key]=1;
+      rows.push({en:a, zh:b});
+    });
+    return rows;
+  }
+  function distinctCount(rows,key){ var o={}; rows.forEach(function(r){ o[r[key]]=1; }); return Object.keys(o).length; }
+
+  /* ---------- 音效 ---------- */
+  var ac=null, muted=false;
+  function initAudio(){ if(ac) return; try{ ac=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ ac=null; } }
+  function tone(f,d,type,vol,delay){
+    if(muted||!ac) return;
+    try{
+      var t0=ac.currentTime+(delay||0), o=ac.createOscillator(), g=ac.createGain();
+      o.type=type||"sine"; o.frequency.setValueAtTime(f,t0);
+      g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(vol||0.15,t0+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t0+d);
+      o.connect(g); g.connect(ac.destination); o.start(t0); o.stop(t0+d+0.05);
+    }catch(e){}
+  }
+  var SFX={
+    right:function(){ tone(660,.14,"triangle",.18); tone(880,.2,"triangle",.18,.1); },
+    bonus:function(){ tone(660,.12,"triangle",.18); tone(880,.12,"triangle",.18,.09); tone(1320,.25,"triangle",.2,.18); },
+    wrong:function(){ tone(150,.3,"sawtooth",.12); },
+    timeout:function(){ tone(330,.2,"square",.08); tone(220,.35,"square",.08,.18); },
+    sudden:function(){ tone(110,.5,"sawtooth",.12); tone(116,.5,"sawtooth",.1,.05); tone(220,.4,"triangle",.12,.4); },
+    win:function(){ [523,659,784,1046].forEach(function(f,i){ tone(f,.3,"triangle",.2,i*.14); }); tone(1318,.6,"triangle",.2,.6); }
+  };
+
+  /* ---------- 首页 ---------- */
+  var elWords=$("#words");
+  function updateCount(){
+    var rows=parseWords(elWords.value), c=$("#wcount");
+    var ok = rows.length>=4 && distinctCount(rows,"en")>=4 && distinctCount(rows,"zh")>=4;
+    c.textContent = "已识别 "+rows.length+" 个词" + (ok ? "" : "(至少需要 4 个不同的词才能出选择题)");
+    c.classList.toggle("warn", !ok);
+    return rows;
+  }
+  function renderSeriesHome(){ $("#serTxt").textContent = S.series[0]+" : "+S.series[1]; $("#seriesRow").classList.toggle("hidden", S.series[0]+S.series[1]===0); }
+  var savedWords = load("vfn.words"), savedNames = load("vfn.names");
+  elWords.value = savedWords || SAMPLE;
+  if(savedNames){ try{ var n=JSON.parse(savedNames); if(n&&n.length===2){ $("#nameL").value=n[0]; $("#nameR").value=n[1]; } }catch(e){} }
+  updateCount(); renderSeriesHome();
+
+  function updateInputHelp(){
+    var touch = $("#cfgInput").value==="touch";
+    $("#keysHelp").innerHTML = touch
+      ? "两位选手并排站,各点<b>自己那一栏</b>的选项(可同时点)<br>右上角 ⏸ 暂停 · ⏭ 跳过本题 · ⛶ 全屏"
+      : "左边选手按 <b>A S D F</b> 选 1–4 项 · 右边选手按 <b>J K L ;</b> 选 1–4 项<br>空格 暂停 · N 跳过本题 · Esc 菜单";
+    $("#tipText").textContent = touch ? "建议点“⛶ 全屏”后再开始,屏幕更大更好点。" : "请先把输入法切到英文;点“开战”后键盘即可使用。";
+  }
+  $("#cfgInput").value = S.cfg.input;
+  $("#cfgInput").addEventListener("change", updateInputHelp);
+  updateInputHelp();
+
+  elWords.addEventListener("input", function(){ updateCount(); store("vfn.words", elWords.value); });
+  $("#btnSample").addEventListener("click", function(){ elWords.value=SAMPLE; updateCount(); store("vfn.words", SAMPLE); });
+  $("#btnFile").addEventListener("click", function(){ $("#file").click(); });
+  $("#file").addEventListener("change", function(e){
+    var f=e.target.files[0]; if(!f) return;
+    f.arrayBuffer().then(function(buf){
+      var text;
+      try{ text=new TextDecoder("utf-8",{fatal:true}).decode(buf); }
+      catch(_){ try{ text=new TextDecoder("gbk").decode(buf); }catch(__){ text=new TextDecoder().decode(buf); } }
+      elWords.value=text.replace(/^\uFEFF/,""); updateCount(); store("vfn.words", elWords.value);
+    });
+    e.target.value="";
+  });
+  $("#btnResetSeries").addEventListener("click", function(){ S.series=[0,0]; renderSeriesHome(); });
+
+  $("#btnStart").addEventListener("click", function(e){
+    initAudio(); e.currentTarget.blur();
+    var rows=updateCount();
+    if(rows.length<4 || distinctCount(rows,"en")<4 || distinctCount(rows,"zh")<4){
+      $("#err").textContent="词表里至少要有 4 个不同的词,请补充后再开始。"; return;
+    }
+    $("#err").textContent="";
+    S.pool=rows;
+    S.names=[$("#nameL").value.trim()||"玩家甲", $("#nameR").value.trim()||"玩家乙"];
+    store("vfn.names", JSON.stringify(S.names));
+    S.cfg={count:+$("#cfgCount").value, time:+$("#cfgTime").value, mode:$("#cfgMode").value, input:$("#cfgInput").value};
+    var all=S.pool.map(function(_,i){ return i; });
+    startRound(all, S.cfg.count);
+  });
+
+  /* ---------- 开局 ---------- */
+  function startRound(indices, count){
+    S.deck=shuffle(indices).slice(0, Math.max(1,count));
+    S.qi=0; S.pos=0; S.points=[0,0]; S.streak=[0,0];
+    S.wrong=[new Set(), new Set()]; S.missed=new Set(); S.used=new Set();
+    S.sudden=false; S.paused=false; S.resolved=false;
+    $("#pauseOv").classList.add("hidden");
+    $("#rain").innerHTML="";
+    for(var s=0;s<2;s++){
+      $("#pname"+s).textContent=S.names[s]; $("#lair"+(s?"R":"L")).textContent=S.names[s];
+      $("#pscore"+s).textContent="0"; updateStreak(s);
+    }
+    buildTicks(); updateTug(false);
+    $("#serTop").textContent=S.series[0]+" : "+S.series[1];
+    showScreen("game");
+    showQuestion(S.deck[0]);
+  }
+  function buildTicks(){
+    var h="", total=LIMIT*2;
+    for(var i=0;i<=total;i++){ h+='<div class="tick'+(i===LIMIT?" mid":"")+'" style="left:'+(i/total*100)+'%"></div>'; }
+    $("#ticks").innerHTML=h;
+  }
+  function showScreen(name){
+    ["setup","game","result"].forEach(function(n){ $("#"+n).classList.toggle("hidden", n!==name); });
+    S.phase = name==="game" ? "play" : name;
+    if(name==="setup") renderSeriesHome();
+  }
+
+  /* ---------- 出题 ---------- */
+  function makeQuestion(wi){
+    var w=S.pool[wi];
+    var type = S.cfg.mode==="mix" ? (Math.random()<.5?"w2m":"m2w") : S.cfg.mode;
+    var ansKey = type==="w2m" ? "zh" : "en";
+    var correct = w[ansKey];
+    var opts=[correct];
+    shuffle(S.pool.filter(function(_,i){ return i!==wi; })).forEach(function(o){
+      if(opts.length<4 && opts.indexOf(o[ansKey])<0) opts.push(o[ansKey]);
+    });
+    opts=shuffle(opts);
+    return { type:type, prompt: type==="w2m" ? w.en : w.zh, options:opts, correct:opts.indexOf(correct) };
+  }
+  function showQuestion(wi){
+    S.wi=wi; S.used.add(wi); S.q=makeQuestion(wi);
+    S.resolved=false; S.tried=[new Set(), new Set()]; S.lock=[0,0];
+    S.timeLeft=S.cfg.time*1000; S.advanceIn=0;
+    $("#qtype").textContent = S.q.type==="w2m" ? "看词选义" : "看义选词";
+    var qt=$("#qtext"); qt.textContent=S.q.prompt; qt.classList.toggle("long", S.q.prompt.length>14);
+    $("#feedback").textContent="";
+    $("#prog").textContent = S.sudden ? "⚡ 突然死亡:先答对者胜" : "第 "+(S.qi+1)+" / "+S.deck.length+" 题";
+    $("#prog").classList.toggle("sd", S.sudden);
+    for(var s=0;s<2;s++){
+      var box=$("#opts"+s); box.innerHTML=""; box.classList.remove("done");
+      $("#panel"+s).classList.remove("locked","flash");
+      for(var i=0;i<4;i++){
+        var b=document.createElement("button");
+        b.type="button"; b.className="opt"; b.dataset.side=s; b.dataset.idx=i;
+        var k=document.createElement("kbd"); k.textContent = S.cfg.input==="touch" ? "ABCD".charAt(i) : KEYLABEL[s][i];
+        var t=document.createElement("span"); t.textContent=S.q.options[i];
+        b.appendChild(k); b.appendChild(t);
+        b.addEventListener("pointerdown", onOptDown);
+        b.addEventListener("click", function(e){ if(e.detail===0) onOptDown(e); });
+        box.appendChild(b);
+      }
+    }
+    updateTimer();
+  }
+  function onOptDown(e){
+    if(e.pointerType==="mouse" && e.button!==0) return;
+    e.preventDefault();
+    var b=e.currentTarget; answer(+b.dataset.side, +b.dataset.idx);
+  }
+  function optBtn(side,idx){ return $("#opts"+side).children[idx]; }
+
+  /* ---------- 作答 ---------- */
+  function answer(side, idx){
+    if(S.phase!=="play"||S.paused||S.resolved) return;
+    if(S.lock[side]>0||S.tried[side].has(idx)) return;
+    if(idx===S.q.correct){ resolve(side); return; }
+    S.tried[side].add(idx);
+    optBtn(side,idx).classList.add("wrong");
+    S.wrong[side].add(S.wi);
+    S.lock[side]=LOCK_MS; S.streak[side]=0; updateStreak(side); updateLock(side);
+    SFX.wrong();
+  }
+  function resolve(side){
+    S.resolved=true;
+    S.points[side]++; S.streak[side]++; S.streak[1-side]=0;
+    var step=1, bonus=false;
+    if(S.streak[side]>=3){ step=2; bonus=true; S.streak[side]=0; }
+    S.pos=Math.max(-LIMIT, Math.min(LIMIT, S.pos+(side===0?-step:step)));
+    $("#pscore"+side).textContent=S.points[side];
+    updateStreak(0); updateStreak(1); updateTug(true);
+    reveal(); var p=$("#panel"+side); p.classList.remove("flash"); void p.offsetWidth; p.classList.add("flash");
+    $("#feedback").textContent = EMOJI[side]+" "+S.names[side]+" 抢到了!" + (bonus ? " 🔥 连对 3 题,多拉一格!" : "");
+    (bonus?SFX.bonus:SFX.right)();
+    S.advanceIn = (Math.abs(S.pos)>=LIMIT || S.sudden) ? 2200 : 1500;
+  }
+  function timeout(){
+    if(S.resolved) return;
+    S.resolved=true; S.missed.add(S.wi); S.streak=[0,0]; updateStreak(0); updateStreak(1);
+    reveal();
+    $("#feedback").textContent="时间到!答案:"+S.q.options[S.q.correct];
+    SFX.timeout(); S.advanceIn=1900;
+    for(var s=0;s<2;s++){ S.lock[s]=0; updateLock(s); }
+  }
+  function reveal(){
+    for(var s=0;s<2;s++){ $("#opts"+s).classList.add("done"); optBtn(s,S.q.correct).classList.add("right"); $("#panel"+s).classList.remove("locked"); }
+  }
+  function next(){
+    if(Math.abs(S.pos)>=LIMIT) return finish();
+    if(S.sudden){
+      if(S.pos!==0) return finish();
+      return startSudden();
+    }
+    S.qi++;
+    if(S.qi>=S.deck.length){
+      if(S.pos===0){ S.sudden=true; SFX.sudden(); return startSudden(); }
+      return finish();
+    }
+    showQuestion(S.deck[S.qi]);
+  }
+  function startSudden(){
+    var fresh=S.pool.map(function(_,i){ return i; }).filter(function(i){ return !S.used.has(i); });
+    var list = fresh.length ? fresh : S.pool.map(function(_,i){ return i; });
+    showQuestion(list[Math.floor(Math.random()*list.length)]);
+  }
+
+  /* ---------- 界面刷新 ---------- */
+  function updateStreak(s){ $("#streak"+s).textContent = S.streak[s]>0 ? "🔥 连对 "+S.streak[s]+"/3" : ""; }
+  function updateLock(s){
+    var p=$("#panel"+s);
+    p.classList.toggle("locked", S.lock[s]>0);
+    p.style.setProperty("--lock", (S.lock[s]/LOCK_MS).toFixed(3));
+  }
+  function updateTimer(){
+    var total=S.cfg.time*1000, r=Math.max(0,S.timeLeft)/total;
+    $("#timerBar").style.width=(r*100)+"%";
+    $("#timer").classList.toggle("low", r<.25);
+  }
+  function updateTug(animate){
+    var pct=(S.pos+LIMIT)/(LIMIT*2)*100;
+    var orb=$("#orb");
+    orb.style.left=pct+"%"; $("#fillL").style.width=pct+"%"; $("#fillR").style.width=(100-pct)+"%";
+    if(animate){ orb.classList.remove("bump"); void orb.offsetWidth; orb.classList.add("bump"); }
+  }
+
+  /* ---------- 计时循环(暂停时不走) ---------- */
+  var last=performance.now();
+  setInterval(function(){
+    var now=performance.now(), dt=Math.min(now-last,200); last=now;
+    if(S.phase!=="play"||S.paused) return;
+    if(!S.resolved){
+      S.timeLeft-=dt;
+      for(var s=0;s<2;s++){ if(S.lock[s]>0){ S.lock[s]=Math.max(0,S.lock[s]-dt); updateLock(s); } }
+      updateTimer();
+      if(S.timeLeft<=0) timeout();
+    } else {
+      S.advanceIn-=dt;
+      if(S.advanceIn<=0){ S.advanceIn=1e9; next(); }
+    }
+  },50);
+
+  /* ---------- 结束 ---------- */
+  function finish(){
+    var w = S.pos<0 ? 0 : 1;
+    S.series[w]++;
+    var sub;
+    if(Math.abs(S.pos)>=LIMIT) sub="一口气把魔法球拖回了自己的地盘!";
+    else if(S.sudden) sub="突然死亡,一击制胜!";
+    else sub="魔法球停在了 "+S.names[w]+" 这一边,抢对 "+S.points[w]+" 题。";
+    $("#resEmoji").textContent = EMOJI[w];
+    $("#resTitle").textContent = S.names[w]+" 获胜!";
+    $("#resSub").textContent = sub;
+    renderResSeries(); renderStats();
+    var n=wrongUnion().length;
+    var rb=$("#btnRematch"); rb.disabled = n===0; rb.textContent = n>0 ? "错词再战("+n+" 词)" : "没有错词";
+    showScreen("result"); SFX.win();
+    rain(["🎃","👻","🦇","🍬","🕸️","⭐"], 34);
+  }
+  function renderResSeries(){ $("#resSeries").textContent = "总比分  🎃 "+S.names[0]+" "+S.series[0]+" : "+S.series[1]+" "+S.names[1]+" 👻"; }
+  function wrongUnion(){
+    var u=new Set(); S.wrong[0].forEach(function(i){ u.add(i); }); S.wrong[1].forEach(function(i){ u.add(i); }); S.missed.forEach(function(i){ u.add(i); });
+    return Array.from(u);
+  }
+  function chip(text,cls){ var c=document.createElement("span"); c.className="chip"+(cls?" "+cls:""); c.textContent=text; return c; }
+  function renderStats(){
+    var host=$("#resStats"); host.innerHTML="";
+    for(var s=0;s<2;s++){
+      var box=document.createElement("div"); box.className="sbox p"+s;
+      var h=document.createElement("h3"); h.textContent=EMOJI[s]+" "+S.names[s];
+      var nums=document.createElement("div"); nums.className="nums";
+      nums.innerHTML="抢对 <b>"+S.points[s]+"</b> 题 · 答错 <b>"+S.wrong[s].size+"</b> 词";
+      box.appendChild(h); box.appendChild(nums);
+      var chips=document.createElement("div"); chips.className="chips";
+      S.wrong[s].forEach(function(i){ chips.appendChild(chip(S.pool[i].en+" "+S.pool[i].zh)); });
+      if(s===0 || true){ /* 无人答出的词两边都列出 */
+        S.missed.forEach(function(i){ if(!S.wrong[s].has(i)) chips.appendChild(chip(S.pool[i].en+" "+S.pool[i].zh+"(无人答出)","miss")); });
+      }
+      if(!chips.children.length){ var ok=document.createElement("span"); ok.className="none"; ok.textContent="全对,没有错词 ✨"; chips.appendChild(ok); }
+      box.appendChild(chips); host.appendChild(box);
+    }
+  }
+  function rain(list,n){
+    var host=$("#rain"); host.innerHTML="";
+    for(var i=0;i<n;i++){
+      var s=document.createElement("span");
+      s.textContent=list[i%list.length];
+      s.style.left=(Math.random()*100)+"vw";
+      s.style.fontSize=(1.2+Math.random()*1.8)+"rem";
+      s.style.animationDuration=(3+Math.random()*3.5)+"s";
+      s.style.animationDelay=(Math.random()*1.6)+"s";
+      host.appendChild(s);
+    }
+    setTimeout(function(){ host.innerHTML=""; }, 9000);
+  }
+
+  /* 结果页按钮 */
+  $("#btnAgain").addEventListener("click", function(e){ e.currentTarget.blur(); initAudio(); startRound(S.pool.map(function(_,i){ return i; }), S.cfg.count); });
+  $("#btnRematch").addEventListener("click", function(e){ e.currentTarget.blur(); initAudio(); var u=wrongUnion(); if(u.length) startRound(u, Math.min(u.length,30)); });
+  $("#btnSwap").addEventListener("click", function(){
+    S.names=[S.names[1],S.names[0]]; S.series=[S.series[1],S.series[0]];
+    $("#nameL").value=S.names[0]; $("#nameR").value=S.names[1]; store("vfn.names", JSON.stringify(S.names));
+    renderResSeries();
+    var b=$("#btnSwap"); b.textContent="已换边 ✓"; setTimeout(function(){ b.textContent="换边"; },1600);
+    /* 换边只对下一局生效;当前结果页的统计仍按上一局显示 */
+  });
+  $("#btnHome").addEventListener("click", function(){ $("#rain").innerHTML=""; showScreen("setup"); });
+
+  /* 暂停 / 菜单 */
+  function setPaused(p){
+    if(S.phase!=="play") return;
+    S.paused=p; $("#pauseOv").classList.toggle("hidden", !p);
+    $("#btnPause").textContent = p ? "▶ 继续" : "⏸ 暂停";
+    if(p) $("#btnResume").focus();
+  }
+  $("#btnPause").addEventListener("click", function(e){ e.currentTarget.blur(); setPaused(!S.paused); });
+  $("#btnResume").addEventListener("click", function(){ setPaused(false); });
+  $("#btnQuit").addEventListener("click", function(){ S.paused=false; $("#pauseOv").classList.add("hidden"); $("#btnPause").textContent="⏸ 暂停"; showScreen("setup"); });
+  $("#btnMute").addEventListener("click", function(e){ muted=!muted; e.currentTarget.textContent=muted?"🔇":"🔊"; e.currentTarget.blur(); });
+
+  /* 跳过、全屏 */
+  $("#btnSkip").addEventListener("click", function(e){ e.currentTarget.blur(); if(S.phase==="play" && !S.paused && !S.resolved) timeout(); });
+  $("#btnFull").addEventListener("click", function(e){
+    e.currentTarget.blur();
+    try{
+      if(document.fullscreenElement){ document.exitFullscreen(); }
+      else if(document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen(); }
+    }catch(_){}
+  });
+  document.addEventListener("contextmenu", function(e){ if(S.phase==="play") e.preventDefault(); });
+
+  /* 键盘 */
+  addEventListener("keydown", function(e){
+    if(S.phase!=="play"||e.repeat||e.ctrlKey||e.metaKey||e.altKey) return;
+    if(e.code==="Space"){ e.preventDefault(); setPaused(!S.paused); return; }
+    if(e.code==="Escape"){ e.preventDefault(); setPaused(!S.paused); return; }
+    if(S.paused) return;
+    if(e.code==="KeyN"){ if(!S.resolved) timeout(); return; }
+    var k=KEYS[e.code];
+    if(k){ e.preventDefault(); answer(k[0],k[1]); }
+  });
+  addEventListener("keyup", function(e){ if(S.phase==="play" && e.code==="Space") e.preventDefault(); });
+})();
+</script>
+</body>
+</html>
